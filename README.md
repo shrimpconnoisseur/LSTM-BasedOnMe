@@ -21,4 +21,4 @@ Then execute in a terminal:
 
 The training phase will know to only read from the "Contents" line.
 It took me two hours to train this thing for such a garbage result.
-Probably because I didn't know what a good learning rate was.
+Probably because I didn't know what a good learning rate was, because the training dataset was way too small, or because I really do just speak like a schizophrenic.
