@@ -2,7 +2,7 @@ import json
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
-from tqdm import tqdm # Progress bar
+from tqdm import tqdm
 
 class MessageDataset(Dataset):
   def __init__(self, json_file, seq_length=100):
@@ -30,9 +30,11 @@ class MessageDataset(Dataset):
     target = self.data[idx+1:idx+self.seq_length+1]
     return seq, target
   
+
 class LSTMModel(nn.Module):
-  def __init__(self, vocab_size, embedding_dim=128, hidden_dim=256, num_layers=2):
+  def __init__(self, vocab_size, embedding_dim=128, hidden_dim=128, num_layers=2):
     super(LSTMModel, self).__init__()
+    
     self.embedding = nn.Embedding(vocab_size, embedding_dim)
     self.lstm = nn.LSTM(embedding_dim, hidden_dim, num_layers, batch_first=True)
     self.fc = nn.Linear(hidden_dim, vocab_size)
@@ -64,7 +66,7 @@ def generate(model, stoi, itos, start_text="", length=200, temperature=0.8):
       
   return output_text
 
-def train_model(json_file, epochs=5, batch_size=32, lr=3e-4, seq_length=100, save_path="lstm_model.pth"):
+def train_model(json_file, epochs=15, batch_size=128, lr=1e-3, seq_length=75, save_path="lstm_model-2.pth"): # ---------------
   dataset = MessageDataset(json_file, seq_length)
   dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
   
@@ -92,7 +94,7 @@ def train_model(json_file, epochs=5, batch_size=32, lr=3e-4, seq_length=100, sav
   
   print(f"Model saved to {save_path}")
   
-def test(save_path="lstm_model.pth"):
+def test(save_path="lstm_model-2.pth"): # ---------------
   checkpoint = torch.load(save_path, map_location=torch.device('cpu'))
   stoi, itos = checkpoint['stoi'], checkpoint['itos']
   vocab_size = len(stoi)
@@ -101,14 +103,13 @@ def test(save_path="lstm_model.pth"):
   model.load_state_dict(checkpoint['model_state_dict'])
   model.eval()
   
-  print("Ready! Type something in to generate a response.\n*Type 'exit' to quit.*\n")
+  print("Type in a prompt to generate a predicted response.\n*Type 'exit' to quit.*\n")
   
   while True:
     prompt = input("Prompt: ")
     if prompt.lower() == 'exit':
       break
     if prompt.strip() == "":
-      print("I SAID \"TYPE SOMETHING IN\", SO DO IT.")
       continue
     
     response = generate(model, stoi, itos, start_text=prompt, length=200)
@@ -131,3 +132,33 @@ if __name__ == "__main__":
       
   if args.test:
     test()
+    
+# Model 1 Params:
+# Epochs: 5
+# Batch Size: 32
+# Learning Rate: 3e-4
+# Sequence Length: 100
+# Hidden Dim: 256
+# Embedding Dim: 128
+# Layers: 2
+# Time Elapsed: 2 hours 34 minutes
+
+# Model 2 Params:
+# Epochs: 10
+# Batch Size: 64
+# Learning Rate: 1e-3
+# Sequence Length: 75
+# Hidden Dim: 128
+# Embedding Dim: 128
+# Layers: 2
+# Time Elapsed: 54 minutes
+
+# Model "speed" Params:
+# Epochs: 10
+# Batch Size: 128
+# Learning Rate: 1e-3
+# Sequence Length: 75
+# Hidden Dim: 128
+# Embedding Dim: 128
+# Layers: 2
+# Time Elapsed: i forgot lol
