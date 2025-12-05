@@ -22,3 +22,7 @@ Then execute in a terminal:
 The training phase will know to only read from the "Contents" line.
 It took me two hours to train this thing for such a garbage result.
 Probably because I didn't know what a good learning rate was, because the training dataset was way too small, or because I really do just speak like a schizophrenic.
+
+=== UPDATE 12/4/25 ===
+If the current model doesn't work, I've updated the main file and added a comment line where to change the model for testing.
+I also included a second version of the model which is hopefully less entropic.
